@@ -101,7 +101,26 @@
               </div>
               </div> <!-- class="chooser panel-body" -->
             </div>
-          </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse4">
+                            <span class="glyphicon glyphicon-link" aria-hidden="true"></span> QR Code</a>
+                    </h4>
+                </div>
+                <div id="collapse4" class="panel-collapse collapse">
+                    <div class="chooser panel-body">
+                        <form action="#" onSubmit="appendQrCode(event)">
+                            <label for="qrText">Text:</label>
+                            <div class="input-group">
+                                <input id="qrText" class="form-control" type="text" min="0" max="200" required>
+                            </div>
+                        </form>
+
+                    </div> <!-- class="chooser panel-body" -->
+                </div>
+            </div>
         </div>
       </fieldset>
     </div>
@@ -183,6 +202,33 @@ function setStatus(data) {
   else
     $('#statusPanel').html('<div id="statusBox" class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-alert"></i><span>Printing was unsuccessful:<br />'+data['message']+'</span></div>');
   $('#printButton').prop('disabled', false);
+}
+
+function appendQrCode(e) {
+    e.preventDefault();
+    var text = $('#qrText').val();
+    const QRC = qrcodegen.QrCode;
+    var qr = qrcodegen.QrCode.encodeText(text, QRC.Ecc.MEDIUM);
+    var out = "\n";
+    for (var y = 0; y < qr.size; y += 2) {
+        for (var x = 0; x < qr.size; x++) {
+            var pixT = qr.getModule(x, y);
+            var pixB = qr.getModule(x, y + 1);
+            if (pixT && pixB)
+                out += "█";
+            else if (pixT)
+                out += "▀";
+            else if (pixB)
+                out += "▄";
+            else
+                out += " ";
+        }
+        out += "\n";
+    }
+    $('#labelText').val($('#labelText').val() + out + '\n');
+    $('#fontFamily').val('Hack (Regular)');
+    $('#fontSize').val('20');
+    preview();
 }
 
 function print() {
